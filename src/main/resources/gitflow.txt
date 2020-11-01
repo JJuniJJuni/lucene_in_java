@@ -1,0 +1,17 @@
+1. 개발 과정
+    - 각 Task 별로 Feature Branch를 만든다. 양식은 feature-'사번'-'taskname'
+        ex) feature-'사번'-'taskname'
+    - 'Dev → QA → Stage' Branch에 단계 별로 Push 해가며 각 환경에서 Test
+    - Stage 단계까지 테스트 했을 시 Branch 이름을 변경하던지 새로 만들던지 해서 prefix를 feature → release로 바꾼다
+        (배포 준비 완료 라고 표시를 하는 것)
+        Ex) feature-'사번'-'taskname' → release-'사번'-'taskname'
+    - 각 프로젝트마다 정기 배포일 정하여 담당자가 'release'로 prefix가 된 Branch들을 한데 모아 새로운 버전으로 Deploy Branch를 만들어 운영 서버에 반영한다
+        Ex) release-2, release-3 → deploy-2.0(이전 버전에서 나온 Branch) →  deploy-2.0으로 서버 실행
+    - 담당자는 배포 이후에 문제가 없을 시 Deploy Branch들을 이전 단계에 모두 Merge 시킨다
+        (동기화)
+2. 장점
+    - Dev, QA, Stage 각 Branch가 로직, 환경 등이 독립되어져 있기 때문에 각 Task가 개발을 진행하는 데에 브레이크가 걸리지 않는다
+    - 안정적인 배포가 가능하다. 담당자가 Release Branch들을 보면서 merge 시킬지 안 시킬지를 한번 확인이 가능하기 때문
+3. 단점
+    - 각 단계의 서버들에 Branch를 들이 붓고 테스트를 하는 것이기 때문에 한 프로젝트에 투입된 인원들이 많게 되면 Conflict가 날 가능성이 많고 심지어 서버 에러가 발생할 수 있다
+    - 각 서버 별로 소스 상태가 Sync가 안 맞을 수 있다. 기간을 정해서 배포 버전과 동일하게 맞추게끔 하는 작업이 필요하다
