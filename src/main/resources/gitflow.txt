@@ -1,3 +1,4 @@
+Korea SSG Search Gitflow
 1. 개발 과정
     - 각 Task 별로 Feature Branch를 만든다. 양식은 feature-'사번'-'taskname'
         ex) feature-'사번'-'taskname'
