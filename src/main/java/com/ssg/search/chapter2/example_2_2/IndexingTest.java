@@ -29,7 +29,7 @@ public class IndexingTest extends TestCase {
     directory = new RAMDirectory();
     // IndexWriter 객체 생성
     IndexWriter writer = getWriter();
-    for(int i = 0; i < ids.length; i++) {
+    for (int i = 0; i < ids.length; i++) {
       Document doc = new Document();
       doc.add(new Field("id", ids[i],
           Field.Store.YES,
@@ -48,9 +48,11 @@ public class IndexingTest extends TestCase {
     // IndexWriter를 닫으며 자동으로 변경 사항을 저장 공간에 반영
     writer.close();
   }
+
   private IndexWriter getWriter() throws IOException {
     return new IndexWriter(directory, new WhitespaceAnalyzer(), IndexWriter.MaxFieldLength.UNLIMITED);
   }
+
   private int getHitCount(String fieldName, String searchString) throws IOException {
     IndexSearcher searcher = new IndexSearcher(directory);
     Term t = new Term(fieldName, searchString);
@@ -59,18 +61,48 @@ public class IndexingTest extends TestCase {
     int hitCount = TestUtil.hitCount(searcher, query);
     return hitCount;
   }
+
   public void testIndexWriter() throws IOException {
     IndexWriter writer = getWriter();
     // IndexWriter 문서 개수 확인
     assertEquals(ids.length, writer.numDocs());
     writer.close();
   }
+
   public void testIndexReader() throws IOException {
     IndexReader reader = IndexReader.open(directory);
     // IndexReader 문서 개수 확인
     assertEquals(ids.length, reader.maxDoc());
     assertEquals(ids.length, reader.numDocs());
     reader.clone();
+  }
+
+  public void testDeleteBeforeOptimize() throws IOException {
+    IndexWriter writer = getWriter();
+    assertEquals(2, writer.numDocs());
+    // 첫 번째 문서 삭제
+    writer.deleteDocuments(new Term("id", "1"));
+    writer.commit();
+    // 색인에 삭제된 문서가 있는지 검증
+    assertTrue(writer.hasDeletions());
+    // 색인된 문서 1건, 삭제된 문서 1건 확인
+    assertEquals(2, writer.maxDoc());
+    assertEquals(1, writer.numDocs());
+    writer.close();
+  }
+
+  public void testDeleteAfterOptimize() throws IOException {
+    IndexWriter writer = getWriter();
+    assertEquals(2, writer.numDocs());
+    writer.deleteDocuments(new Term("id", "1"));
+    // 삭제된 문서를 실제로 제거하게 최적화 실행
+    writer.optimize();                //3
+    writer.commit();
+    assertFalse(writer.hasDeletions());
+    // 색인된 문서 1건, 삭제된 문서는 없다고 확인
+    assertEquals(1, writer.maxDoc());  //C
+    assertEquals(1, writer.numDocs()); //C
+    writer.close();
   }
 
 }
