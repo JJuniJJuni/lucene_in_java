@@ -1,4 +1,4 @@
-package com.ssg.search.chapter2.example_2_2;
+package com.ssg.search.chapter2;
 
 import com.ssg.search.common.TestUtil;
 import junit.framework.TestCase;
@@ -61,7 +61,7 @@ public class IndexingTest extends TestCase {
     int hitCount = TestUtil.hitCount(searcher, query);
     return hitCount;
   }
-
+  // 예제 2_1
   public void testIndexWriter() throws IOException {
     IndexWriter writer = getWriter();
     // IndexWriter 문서 개수 확인
@@ -76,7 +76,7 @@ public class IndexingTest extends TestCase {
     assertEquals(ids.length, reader.numDocs());
     reader.clone();
   }
-
+  // 예제 2_2
   public void testDeleteBeforeOptimize() throws IOException {
     IndexWriter writer = getWriter();
     assertEquals(2, writer.numDocs());
@@ -104,5 +104,32 @@ public class IndexingTest extends TestCase {
     assertEquals(1, writer.numDocs()); //C
     writer.close();
   }
+  // 예제 2_3
+  public void testUpdate() throws IOException {
+    assertEquals(1, getHitCount("city", "Amsterdam"));
 
+    IndexWriter writer = getWriter();
+    // 'Haag' 라는 도시를 나타내는 문서 준비
+    Document doc = new Document();
+    doc.add(new Field("id", "1",
+        Field.Store.YES,
+        Field.Index.NOT_ANALYZED));
+    doc.add(new Field("country", "Netherlands",
+        Field.Store.YES,
+        Field.Index.NO));
+    doc.add(new Field("contents",
+        "Den Haag has a lot of museums",
+        Field.Store.NO,
+        Field.Index.ANALYZED));
+    doc.add(new Field("city", "Den Haag",
+        Field.Store.YES,
+        Field.Index.ANALYZED));
+    // 변경 메소드 호출
+    writer.updateDocument(new Term("id", "1"), doc);
+    writer.close();
+    // 기존 문서가 없어졌는지 확인
+    assertEquals(0, getHitCount("city", "Amsterdam"));
+    // 새로 추가한 문서가 보이는 지 확인
+    assertEquals(1, getHitCount("city", "Haag"));
+  }
 }

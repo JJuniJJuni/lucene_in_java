@@ -1,4 +1,4 @@
-package com.ssg.search.chapter1.example_1_2;
+package com.ssg.search.chapter1;
 
 import org.apache.lucene.analysis.standard.StandardAnalyzer;
 import org.apache.lucene.document.Document;
